@@ -27,7 +27,10 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import LSTM
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
-
+fig = plt.figure()
+ 
+fig.set_figheight(8)
+fig.set_figwidth(15)
 # fix random seed for reproducibility
 
 tf.random.set_seed(0)
@@ -60,7 +63,7 @@ def create_dataset(dataset, look_back=1, target = -1):
 	return np.array(dataX), np.array(dataY)
 
 #df = dataFrame[["High","Low","Open","Volume","Marketcap","Close"]]
-dataset = dataFrame[["Volume","Close"]].values
+dataset = dataFrame[["Sentiment_Score","pos","neg","neu","Volume","Close"]].values
 dataset = dataset.astype('float32')
 
 # normalize the dataset
@@ -128,18 +131,18 @@ testY = y_scaler.inverse_transform(testY.reshape(-1, 1))
 
 
 # calculate root mean squared error
-print("LSTM with look_back = ",look_back)
+print("LSTM with Sentiment features")
 trainScore = np.sqrt(mean_squared_error(trainY, trainPredict))
 print('Train Score: %.2f RMSE' % (trainScore))
 testScore = np.sqrt(mean_squared_error(testY, testPredict))
 print('Test Score: %.2f RMSE' % (testScore))
 predict_Train =trainPredict
 predict = testPredict
-print(f"mean_squared_error : {mean_squared_error(testY, predict)}")
-print(f"mean_absolute_error : {mean_absolute_error(testY, predict)}")
+print(f"test mean_squared_error : {mean_squared_error(testY, predict)}")
+print(f"test mean_absolute_error : {mean_absolute_error(testY, predict)}")
 print("----------------")
-print(f"mean_squared_error Train : {mean_squared_error(trainY, predict_Train)}")
-print(f"mean_absolute_error Train : {mean_absolute_error(trainY, predict_Train)}")
+print(f"Train mean_squared_error Train : {mean_squared_error(trainY, predict_Train)}")
+print(f"Train mean_absolute_error Train : {mean_absolute_error(trainY, predict_Train)}")
 print("----------------")
 print("Train R2 score:", r2_score(trainY, predict_Train))
 print("Test R2 score:", r2_score(testY, predict))
@@ -159,7 +162,7 @@ plt.plot(trainPredictPlot)
 plt.plot(testPredictPlot)
 plt.show()'''
 # shift train predictions for plotting
-
+from LSTM import plot_pred_train_test
 def plot_pred_train_test(trainPredict ,testPredict,dataset =dataFrame[["timestamp","Close"]].values
                         , title = "Model eval",xLabel ="X",yLabel = "Y",look_back =1):
     
@@ -183,72 +186,17 @@ def plot_pred_train_test(trainPredict ,testPredict,dataset =dataFrame[["timestam
     plt.legend()
     plt.show()
 
-plot_pred_train_test(trainPredict ,testPredict,title = "LSTM - training over (Volume,Close)",
+plot_pred_train_test(trainPredict ,testPredict,title = "LSTM - training overn\n(Sentiment_Score,pos,neg,neu,Volume,Close)",
                      xLabel ="Date", yLabel= "Close price")
 
 
 
 #############################################################################################3
-#test_day_close = close #23389.43#23231.73
-test_input = np.array([volume,close])
-test_input = test_input.reshape(1, 2)
+#"Sentiment_Score","pos","neg","neu","Volume","Close"
+test_input = np.array([Sentiment_Score,pos,neg,neu,volume,close])
+test_input = test_input.reshape(1, 6)
 test_input = X_scaler.transform(test_input)
 test_input = np.reshape(test_input, (test_input.shape[0], 1, test_input.shape[1]))
 pred= model.predict(test_input)
 
-LSTM_day_pred = y_scaler.inverse_transform(pred)[0][0]
-
-'''
-dataset2 =dataFrame[["timestamp","Close"]].values
-last_n = 5
-x_axes_labels = dataset2[-last_n:,0]
-
-x = np.arange(len(x_axes_labels))  # the label locations
-fig, ax = plt.subplots()
-ax.plot(x,dataset2[-last_n:,1], label = "actual")
-ax.plot(x,testPredictPlot[-last_n:], label = "test prediction")
-ax.set_title(f'LSTM Model prediction for last {last_n} days\n- training over close only')
-ax.set_ylabel('Close')
-ax.set_xlabel('date')
-ax.set_xticks(x, x_axes_labels , rotation='vertical')
-ax.legend()
-fig.tight_layout()
-plt.show()
-
- 
-
-# Date Jul 20, 2022
-#["High","Low","Open","Volume","Marketcap","Close"]
-#Open*	High	Low	Close**	Volume	Market Cap
-#$23,393.19	$24,196.82	$23,009.95	$23,231.73	$42,932,549,127	$443,696,738,856
-test_day_close = 23389.43#23231.73
-test_input = np.array([test_day_close])
-test_input = scaler.fit_transform(test_input[:].reshape(-1, 1))
-test_input = np.reshape(test_input, (test_input.shape[0], 1, test_input.shape[1]))
-pred= model.predict(test_input)
-
-LSTM_day_pred = scaler.inverse_transform(pred)[0][0]
-actual_day_value = 23164.63
-x_axes_labels = ["Jul_202022_close","actual","LSTM","LinearR"]
-
-x = np.arange(len(x_axes_labels))  # the label locations
-fig, ax = plt.subplots()
-b1 = ax.bar(0,test_day_close)
-b2 = ax.bar(1,actual_day_value)
-b3 = ax.bar(2,LSTM_day_pred)
-b4 = ax.bar(3,lr_day_pred)
-plt.bar_label(b1, fmt='%.2f')
-plt.bar_label(b2, fmt='%.2f')
-plt.bar_label(b3, fmt='%.2f')
-plt.bar_label(b4, fmt='%.2f')
-
-ax.set_ylim(23000,23400)
-ax.set_title(f'Compare models results for predicting\n the close for Jul 21, 2022')
-ax.set_ylabel('Close')
-ax.set_xlabel('date')
-ax.set_xticks(x, x_axes_labels , rotation='vertical')
-
-ax.legend()
-fig.tight_layout()
-plt.show()
-'''
+LSTM_2_day_pred = y_scaler.inverse_transform(pred)[0][0]

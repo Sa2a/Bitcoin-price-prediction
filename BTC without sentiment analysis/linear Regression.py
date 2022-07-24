@@ -143,7 +143,7 @@ df = dataFrame[["Volume","Close"]]
 #df = dataFrame[["Open","Close"]]
 X = df.iloc[:-1, :].values
 y = df.iloc[1:, -1].values
-
+'''
 # normalize the dataset
 scaler = MinMaxScaler(feature_range=(0, 1))
 train_transformed = X#scaler.fit_transform(X)
@@ -153,6 +153,7 @@ target_transformed = y.reshape(-1, 1)#scaler.fit_transform(y.reshape(-1, 1))
 train_size = int(len(train_transformed) * 0.80)
 test_size = len(train_transformed) - train_size
 X_train, X_test ,y_train, y_test = train_transformed[0:train_size,:], train_transformed[train_size:,:], target_transformed[0:train_size,:], target_transformed[train_size:,:]
+'''
 from sklearn.model_selection import train_test_split
 
 X_train, X_test ,y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
