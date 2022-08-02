@@ -7,17 +7,27 @@ Created on Sat Jul 23 03:12:17 2022
 import numpy as np
 import matplotlib.pyplot as plt
 models_evaluation_dictionary = {}
-models_evaluation_dictionary["LSTM_without_sentiment"] = (331.83 ,380.81, 0.9926362534209957, 0.975465891616951) 
-models_evaluation_dictionary["LSTM_with_sentiment"] = (428.84 ,652.10 ,0.9877010425293345, 0.9280579077975442)
 
-models_evaluation_dictionary["LR_without_sentiment"] = (324.46, 373.6, 0.9929592674492113, 0.9763780632972102)
-models_evaluation_dictionary["LR_with_sentiment"] = (319.66, 364.2,0.9931659715774585, 0.9775534841016149)
+# models_evaluation_dictionary["LR_BTC"] = (324.46, 373.6, 0.9929592674492113, 0.9763780632972102)
+# models_evaluation_dictionary["LR_BTC_sentiment"] = (319.66, 364.2,0.9931659715774585, 0.9775534841016149)
 
-models_evaluation_dictionary["RF_without_sentiment"] = (130.63, 543.3, 0.9988587825043616, 0.9500471116556298)
-models_evaluation_dictionary["RF_with_sentiment"]  = (162.95, 458.21, 0.9982241848275566, 0.9644779299560987)
+# models_evaluation_dictionary["RF_BTC"] = (130.63, 543.3, 0.9988587825043616, 0.9500471116556298)
+# models_evaluation_dictionary["RF_BTC_sentiment"]  = (162.95, 458.21, 0.9982241848275566, 0.9644779299560987)
 
-models_evaluation_dictionary["AuML_without_sentiment"] = (311.47, 1754.52, 0.9967454895979643, 0.4791917003451165)
-models_evaluation_dictionary["AuML_with_sentiment"]  = (217.70, 601.52, 0.9968304022163204, 0.9387842973492698)
+# models_evaluation_dictionary["XGBoost_BTC"] = (311.47, 1754.52, 0.9967454895979643, 0.4791917003451165)
+# models_evaluation_dictionary["XGBoost_BTC_sentiment"]  = (217.70, 601.52, 0.9968304022163204, 0.9387842973492698)
+
+# models_evaluation_dictionary["LSTM_BTC"] = (331.83 ,380.81, 0.9926362534209957, 0.975465891616951) 
+# models_evaluation_dictionary["LSTM_BTC_sentiment"] = (428.84 ,652.10 ,0.9877010425293345, 0.9280579077975442)
+
+models_evaluation_dictionary["LSTM"] = (115244.37 ,130535.40, 339.48, 358.32) 
+
+models_evaluation_dictionary["LR"] = (134353.62, 135241.35, 366.54, 367.75)
+
+models_evaluation_dictionary["RF"] = (237984.07, 192979.29, 487.83, 439.29)
+
+models_evaluation_dictionary["XGBoost"] = (474237.91, 351862.82, 688.65, 593.18)
+
 
 keys = models_evaluation_dictionary.keys()
 keys = list(keys)
@@ -26,32 +36,32 @@ x_axes_labels = keys
 
 x = np.arange(len(x_axes_labels))  # the label locations
   # the width of the bars
-train_rmse =[]
-test_rmse = []
-train_r2 = []
-test_r2 = []
+MSE_BTC =[]
+MSE_BTC_SA = []
+RMSE_BTC =[]
+RMSE_BTC_SA = []
 
 for key in keys:  
-  train_rmse.append(models_evaluation_dictionary[key][0])
-  test_rmse.append(models_evaluation_dictionary[key][1])
+  MSE_BTC.append(models_evaluation_dictionary[key][0])
+  MSE_BTC_SA.append(models_evaluation_dictionary[key][1])
   
   
-  train_r2.append(round(models_evaluation_dictionary[key][2] * 100,2))
-  test_r2.append(round(models_evaluation_dictionary[key][3] * 100,2))
+  RMSE_BTC.append(models_evaluation_dictionary[key][2])
+  RMSE_BTC_SA.append(models_evaluation_dictionary[key][3])
   
-width = 0.35
-fig, ax = plt.subplots(figsize=(15,8))
+width = 0.3
+fig, ax = plt.subplots(figsize=(9,6))
   # best_k, max_silhouette,cohen_kappa_scores,homogeneity,completeness,VM
-rects1 = ax.bar(x - width/2, train_rmse, width, label='train_rmse')
-rects2 = ax.bar(x + width/2, test_rmse, width, label='test_rmse')
+rects1 = ax.bar(x - width/2, MSE_BTC, width, label='BTC Only')
+rects2 = ax.bar(x + width/2, MSE_BTC_SA, width, label='BTC & Sentiment')
 #rects4 = ax.bar(x + width,train_r2, width, label='train_r2')
 #rects5 = ax.bar(x + 2*width, test_r2, width, label='test_r2')
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('measures value')
+ax.set_ylabel('MSE')
 ax.set_xlabel('modles')
-ax.set_title('RMSE of the models')
-ax.set_xticks(x, x_axes_labels , rotation=10)
+ax.set_title('Models comarison')
+ax.set_xticks(x, x_axes_labels)
 ax.legend()
 ax.bar_label(rects1, padding=3)
 ax.bar_label(rects2, padding=3)
@@ -59,19 +69,19 @@ fig.tight_layout()
 plt.show()
 
 
-fig, ax = plt.subplots(figsize=(15,8))
-rects4 = ax.bar(x - width/2 ,train_r2, width, label='train_R2')
-rects5 = ax.bar(x + width/2, test_r2, width, label='test_R2')
+fig, ax = plt.subplots(figsize=(9,6))
+rects4 = ax.bar(x - width/2 ,RMSE_BTC, width, label='BTC Only')
+rects5 = ax.bar(x + width/2, RMSE_BTC_SA, width, label='BTC & Sentiment')
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('measures value')
+ax.set_ylabel('RMSE')
 ax.set_xlabel('modles')
-ax.set_title('R2 value for the models')
-ax.set_xticks(x, x_axes_labels , rotation=10)
+ax.set_title('Models comarison')
+ax.set_xticks(x, x_axes_labels )
 ax.legend()
 ax.bar_label(rects4, padding=3)
 ax.bar_label(rects5, padding=3)
-ax.set_ylim(30,110)
+# ax.set_ylim(30,110)
 fig.tight_layout()
 plt.show()
 
